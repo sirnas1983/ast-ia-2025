@@ -3,36 +3,36 @@
   "WorkspaceRootPath": "C:\\dhiebl\\progra3\\AstApp\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\servicios\\openaiservicio.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\servicios\\openaiservicio.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\servicios\\aststorageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\servicios\\aststorageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\components\\pages\\nuevaast.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\components\\pages\\nuevaast.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\components\\pages\\misast.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\components\\pages\\misast.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\components\\pages\\nuevaast.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\components\\pages\\nuevaast.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\models\\opcionsugerida.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\models\\opcionsugerida.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\servicios\\aststorageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\servicios\\aststorageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\models\\ast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\models\\ast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\servicios\\openaiservicio.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\servicios\\openaiservicio.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\models\\opcionsugerida.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|solutionrelative:astapp\\models\\opcionsugerida.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E7A5DA79-8187-4AA2-9068-A83DB3107503}|AstApp\\AstApp.csproj|c:\\dhiebl\\progra3\\astapp\\astapp\\models\\actividad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -94,7 +94,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 11,
           "Children": [
             {
               "$type": "Bookmark",
@@ -118,26 +118,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\appsettings.json",
-              "RelativeDocumentMoniker": "AstApp\\appsettings.json",
-              "ToolTip": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\appsettings.json",
-              "RelativeToolTip": "AstApp\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAC3AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-07-19T13:02:19.206Z",
+              "DocumentIndex": 2,
+              "Title": "AstStorageService.cs",
+              "DocumentMoniker": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Servicios\\AstStorageService.cs",
+              "RelativeDocumentMoniker": "AstApp\\Servicios\\AstStorageService.cs",
+              "ToolTip": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Servicios\\AstStorageService.cs",
+              "RelativeToolTip": "AstApp\\Servicios\\AstStorageService.cs",
+              "ViewState": "AgIAADsAAAAAAAAAAAArwFgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-12T14:00:40.532Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "OpenAIServicio.cs",
               "DocumentMoniker": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Servicios\\OpenAIServicio.cs",
               "RelativeDocumentMoniker": "AstApp\\Servicios\\OpenAIServicio.cs",
               "ToolTip": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Servicios\\OpenAIServicio.cs",
               "RelativeToolTip": "AstApp\\Servicios\\OpenAIServicio.cs",
-              "ViewState": "AgIAAMcAAAAAAAAAAAArwM8AAAAzAAAAAAAAAA==",
+              "ViewState": "AgIAAKMAAAAAAAAAAAAewMoAAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-11T22:28:36.491Z",
               "EditorCaption": ""
@@ -156,15 +156,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 3,
               "Title": "Ast.cs",
               "DocumentMoniker": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Models\\Ast.cs",
               "RelativeDocumentMoniker": "AstApp\\Models\\Ast.cs",
               "ToolTip": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Models\\Ast.cs",
               "RelativeToolTip": "AstApp\\Models\\Ast.cs",
-              "ViewState": "AgIAABEAAAAAAAAAAAA6wB4AAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAABQAAAAAAAAAAAAxwBcAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T13:46:25.672Z"
+              "WhenOpened": "2025-07-12T13:46:25.672Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -180,20 +181,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "AstStorageService.cs",
-              "DocumentMoniker": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Servicios\\AstStorageService.cs",
-              "RelativeDocumentMoniker": "AstApp\\Servicios\\AstStorageService.cs",
-              "ToolTip": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Servicios\\AstStorageService.cs",
-              "RelativeToolTip": "AstApp\\Servicios\\AstStorageService.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAArwAsAAAAzAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T14:00:40.532Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "OpcionSugerida.cs",
               "DocumentMoniker": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Models\\OpcionSugerida.cs",
               "RelativeDocumentMoniker": "AstApp\\Models\\OpcionSugerida.cs",
@@ -205,19 +193,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 0,
               "Title": "NuevaAst.razor",
               "DocumentMoniker": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Components\\Pages\\NuevaAst.razor",
               "RelativeDocumentMoniker": "AstApp\\Components\\Pages\\NuevaAst.razor",
               "ToolTip": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Components\\Pages\\NuevaAst.razor",
               "RelativeToolTip": "AstApp\\Components\\Pages\\NuevaAst.razor",
-              "ViewState": "AgIAAGABAAAAAAAAAAAAAGkBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABsDAAAAAAAAAAAAALkDAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-07-09T12:17:16.778Z"
+              "WhenOpened": "2025-07-09T12:17:16.778Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 6,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Program.cs",
               "RelativeDocumentMoniker": "AstApp\\Program.cs",
@@ -225,21 +214,32 @@
               "RelativeToolTip": "AstApp\\Program.cs",
               "ViewState": "AgIAAAkAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-09T10:21:48.253Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-09T10:21:48.253Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
               "Title": "MisAst.razor",
               "DocumentMoniker": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Components\\Pages\\MisAst.razor",
               "RelativeDocumentMoniker": "AstApp\\Components\\Pages\\MisAst.razor",
               "ToolTip": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\Components\\Pages\\MisAst.razor",
               "RelativeToolTip": "AstApp\\Components\\Pages\\MisAst.razor",
-              "ViewState": "AgIAADIAAAAAAAAAAAAMwEMAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAKUAAAAAAAAAAAAAALQAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-07-12T14:13:56.581Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\appsettings.json",
+              "RelativeDocumentMoniker": "AstApp\\appsettings.json",
+              "ToolTip": "C:\\dhiebl\\progra3\\AstApp\\AstApp\\appsettings.json",
+              "RelativeToolTip": "AstApp\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAC3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-07-19T13:02:19.206Z"
             },
             {
               "$type": "Document",

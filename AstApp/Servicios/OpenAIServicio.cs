@@ -173,27 +173,38 @@ namespace AstApp.Servicios
         {
             var json = JsonSerializer.Serialize(ast);
             var prompt = $$$"""
-    A continuación se presenta una AST (Análisis de Seguridad en el Trabajo) en formato JSON. Necesito que evalúes la calidad general de esta AST y devuelvas:
+    A continuación se presenta una AST (Análisis de Seguridad en el Trabajo) con su estructura general y tareas con peligros, riesgos y acciones correctivas.
 
-    - Un puntaje numérico del 0 al 100 (entero), que va a ser la suma de cada uno de los puntajes por punto clave.
-    - Un comentario con una devolución general sobre la calidad de los ítems, redacción, relación entre elementos y completitud.
+    Necesito que la evalúes y devuelvas:
+    - Un puntaje general del 0 al 100 (entero).
+    - Un comentario detallado, dividido en 4 grupos de criterios, con su puntaje correspondiente.
 
-    Consideraciones importantes:
-    - ¿Los peligros están bien redactados como fuentes concretas de daño (físicas, químicas, etc.)? - 10 ptos.
-    - ¿Los riesgos derivan lógicamente de los peligros? - 10 ptos.
-    - ¿Las acciones correctivas se aplican directamente para mitigar esos riesgos? - 10 ptos.
-    - ¿Las listas son variadas, completas y coherentes? - 10 ptos.
-    - ¿Se evita repetir peligros genéricos o acciones poco útiles? - 10 ptos.
-    - ¿La cantidad de ítems es suficiente (al menos 3 por lista y por tarea)? - 10 ptos.
-    - ¿Las tareas guardan relacion con el trabajo general y entre sí? - 10 ptos.
-    - ¿Se evita el uso de EPP, capacitaciones o medidas a largo plazo en las acciones correctivas? - 10 ptos.
-    - ¿Se respetan las reglas de relación entre peligros, riesgos y acciones correctivas? - 10 ptos.
-    - ¿Los EPP Necesarios, son suficientes y adecuados? - 10 ptos.
+    Los grupos y sus ponderaciones son los siguientes:
 
+    🔹 **GRUPO 1 - Coherencia entre elementos (25%)**  
+    - ¿Los peligros están bien redactados como fuentes concretas de daño (físicas, químicas, mecánicas, etc.)?  
+    - ¿Los riesgos derivan lógicamente de los peligros?  
+    - ¿Las acciones correctivas están directamente orientadas a mitigar esos riesgos?
+
+    🔹 **GRUPO 2 - Variedad, especificidad y suficiencia (25%)**  
+    - ¿Las listas de peligros, riesgos y acciones son variadas y coherentes?  
+    - ¿Se evita repetir peligros genéricos o acciones poco útiles?  
+    - ¿La cantidad de ítems es suficiente (al menos 10 por lista en total)?
+
+    🔹 **GRUPO 3 - Contexto y aplicabilidad de medidas (25%)**  
+    - ¿Las tareas están correctamente relacionadas con el trabajo general?  
+    - ¿Se evita el uso de EPP, capacitaciones o medidas a largo plazo como acciones correctivas?  
+    - ¿Se respeta la lógica: peligro → riesgo → acción correctiva?
+
+    🔹 **GRUPO 4 - Evaluación de EPP (25%)**  
+    - ¿Se mencionan los EPP necesarios de manera explícita y concreta?  
+    - ¿Son adecuados y suficientes para los peligros y tareas descritas?  
+    ⚠️ *IMPORTANTE: Si no se menciona ningún EPP, este grupo debe recibir puntaje 0/25, sin excepciones.*
+    
     FORMATO DE RESPUESTA ESTRICTO:
     {{
         "puntaje": <número entre 0 y 100>,
-        "comentario": "<devolución detallada>"
+        "comentario": "<devolución detallada - Segmentada por grupos (con saltos de linea para claridad del lector)>"
     }}
 
     AST A EVALUAR (JSON):

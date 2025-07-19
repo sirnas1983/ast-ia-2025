@@ -18,6 +18,7 @@
         public List<string> EppRequeridos { get; set; } = new();
         public string? EppOtrosTexto { get; set; }
         public bool EstaSincronizada { get; set; } = false;
+        public PuntajeAST PuntajeAst { get; set; } = new();
     }
 
     public class TareaAst

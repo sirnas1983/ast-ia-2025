@@ -161,8 +161,8 @@
 				</thead>
 				<tbody>
 					@if (actividades[index].PeligrosSugeridos.Any() ||
-															actividades[index].RiesgosSugeridos.Any() ||
-															actividades[index].AccionesSugeridas.Any())
+																																								actividades[index].RiesgosSugeridos.Any() ||
+																																								actividades[index].AccionesSugeridas.Any())
 					{
 						var maxFilas = MaximoFilas(actividades[index]);
 						for (int j = 0; j < maxFilas; j++)
@@ -356,12 +356,25 @@
 		</div>
 	</div>
 }
-
+@if (cargandoPuntaje)
+{
+	<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+				background-color: rgba(0, 0, 0, 0.6); z-index: 1050;"
+	class="d-flex justify-content-center align-items-center text-white">
+		<div class="text-center">
+			<div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;" role="status">
+				<span class="visually-hidden">Cargando...</span>
+			</div>
+			<h5>Aguarda mientras se analiza tu AST...</h5>
+		</div>
+	</div>
+}
 
 @code {
 	[Inject] private OpenAIService OpenIA { get; set; } = default!;
 	[Parameter] public string? Id { get; set; }
 
+	private bool cargandoPuntaje = false;
 	private string tarea = string.Empty;
 	private string areaTrabajo = string.Empty;
 	private string gerenciaSeleccionada = string.Empty;
@@ -727,6 +740,8 @@
 			eppsSeleccionados.Add(otrosEppTexto.Trim());
 		}
 
+
+
 		var nuevaAst = new Ast
 			{
 				TrabajoARealizar = tarea,
@@ -762,6 +777,24 @@
 				}).ToList()
 			};
 
+		try
+		{
+			cargandoPuntaje = true;
+			StateHasChanged();
+			var puntajeAst = await OpenIA.PuntuarAstDesdeJsonAsync(nuevaAst);
+			nuevaAst.PuntajeAst = puntajeAst ?? new();
+		}
+		catch (Exception)
+		{
+			toastMensaje = $"Error al puntuar la AST.";
+			toastClass = "bg-danger";
+			await JS.InvokeVoidAsync("mostrarToast");
+		}
+		finally
+		{
+			cargandoPuntaje = false;
+			StateHasChanged();
+		}
 
 
 		await AstStorage.SaveAsync(nuevaAst);
@@ -918,4 +951,3 @@
 	}
 
 }
-a

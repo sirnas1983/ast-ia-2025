@@ -68,10 +68,25 @@ namespace AstApp.Servicios
         public async Task SaveAsync(Ast nuevaAst)
         {
             var lista = await GetAllAsync();
-            lista.Add(nuevaAst);
+
+            // Buscar si ya existe una AST con el mismo Id
+            var existenteIndex = lista.FindIndex(a => a.Id == nuevaAst.Id);
+
+            if (existenteIndex >= 0)
+            {
+                // Si ya existe, reemplazar
+                lista[existenteIndex] = nuevaAst;
+            }
+            else
+            {
+                // Si no existe, agregar nueva
+                lista.Add(nuevaAst);
+            }
+
             var json = JsonSerializer.Serialize(lista);
             await _js.InvokeVoidAsync("localStorage.setItem", StorageKey, json);
         }
+
 
         public async Task DeleteAsync(Ast ast)
         {
