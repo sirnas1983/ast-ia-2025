@@ -1,0 +1,171 @@
+﻿@page "/mis-ast"
+@rendermode InteractiveServer
+@using AstApp.Models
+@using AstApp.Servicios
+@using System.Text.Json
+@inject AstStorageService AstStorage
+@inject IJSRuntime JS
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h3 class="mb-0">Mis AST</h3>
+	<a href="/nueva-ast" class="btn btn-primary">+ Generar AST</a>
+</div>
+
+@if (!inicializado)
+{
+	<p>Cargando ASTs...</p>
+}
+else if ((asts is null || !asts.Any()) && (borradores is null || !borradores.Any()))
+{
+	<p>No hay ASTs almacenadas.</p>
+}
+else
+{
+	<h5 class="mt-4">ASTs Finalizadas</h5>
+	<table class="table table-sm">
+		<thead>
+			<tr>
+				<th>Trabajo</th>
+				<th>Fecha</th>
+				<th>Área</th>
+				<th>Almacenamiento</th>
+				<th>Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var ast in asts)
+			{
+				<tr>
+					<td>@ast.TrabajoARealizar</td>
+					<td>@ast.FechaHora.ToString()</td>
+					<th>@ast.AreaDeTrabajo</th>
+					<td>
+						<span class="badge @(ast.EstaSincronizada ? "bg-success" : "bg-secondary")">
+							@(ast.EstaSincronizada ? "Sincronizada" : "Local")
+						</span>
+					</td>
+					<td>
+						<a href="/ver-ast/@ast.Id" class="btn btn-sm btn-success me-1">
+							<i class="bi bi-printer-fill" style="font-size:1.25rem;"></i>
+						</a>
+						<button class="btn btn-sm btn-outline-primary me-1" @onclick="() => MostrarQR(ast)">
+							<i class="bi bi-qr-code-scan" style="font-size:1.25rem;"></i>
+						</button>
+						<button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarAst(ast)">
+							<i class="bi bi-trash-fill" style="font-size:1.25rem;"></i>
+						</button>
+						<button class="btn btn-sm btn-outline-warning" @onclick="() => PuntuarAst(ast)">
+							<i class="bi bi-trophy-fill" style="font-size:1.25rem;"></i>
+						</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+
+}
+
+@if (borradores.Any())
+{
+	<h5 class="mt-4">Borradores</h5>
+	<table class="table table-sm table-warning">
+		<thead>
+			<tr>
+				<th>Trabajo</th>
+				<th>Guardado</th>
+				<th>Área</th>
+				<th>Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var borrador in borradores)
+			{
+				<tr>
+					<td>@borrador.TrabajoARealizar</td>
+					<td>@borrador.FechaHora.ToString("g")</td>
+					<td>@borrador.AreaDeTrabajo</td>
+					<td>
+						<a class="btn btn-sm btn-primary" href="@($"/nueva-ast/{borrador.Id}")">Continuar</a>
+						<button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarBorrador(borrador)">Eliminar</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+else
+{
+	<p class="text-muted">No hay borradores guardados.</p>
+}
+@if (mostrarModal && resultadoPuntaje != null)
+{
+	<div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header bg-primary text-white">
+					<h5 class="modal-title">Evaluación de la AST</h5>
+					<button type="button" class="btn-close" @onclick="() => mostrarModal = false"></button>
+				</div>
+				<div class="modal-body">
+					<p><strong>Puntaje:</strong> @resultadoPuntaje.Puntaje / 100</p>
+					<p><strong>Comentario:</strong></p>
+					<p>@resultadoPuntaje.Comentario</p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-secondary" @onclick="() => mostrarModal = false">Cerrar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+@code {
+	private List<Ast>? asts;
+	private bool inicializado = false;
+	private List<Ast> borradores = new();
+	private PuntajeAST? resultadoPuntaje;
+	private bool mostrarModal = false;
+
+	[Inject] private OpenAIService OpenIA { get; set; } = default!;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			asts = await AstStorage.GetAllAsync();
+			asts = asts.OrderByDescending(a => a.FechaHora).ToList();
+			borradores = await AstStorage.GetAllDraftsAsync();
+			borradores = borradores.OrderByDescending(a => a.FechaHora).ToList();
+			inicializado = true;
+			StateHasChanged();
+		}
+	}
+
+	private async Task EliminarAst(Ast ast)
+	{
+		await AstStorage.DeleteAsync(ast);
+		asts = await AstStorage.GetAllAsync();
+
+	}
+
+	private async Task EliminarBorrador(Ast borrador)
+	{
+		await AstStorage.DeleteDraftAsync(borrador.Id);
+		borradores.Remove(borrador);
+	}
+
+	private async Task PuntuarAst(Ast ast)
+	{
+		resultadoPuntaje = await OpenIA.PuntuarAstDesdeJsonAsync(ast);
+		mostrarModal = resultadoPuntaje != null;
+	}
+
+
+	private async Task MostrarQR(Ast ast)
+	{
+		var json = JsonSerializer.Serialize(ast);
+		var compressedJson = await JS.InvokeAsync<string>("LZString.compressToEncodedURIComponent", json);
+		await JS.InvokeVoidAsync("localStorage.setItem", "ast-qr-data", compressedJson);
+		await JS.InvokeVoidAsync("generarQRDesdeStorage");
+	}
+}

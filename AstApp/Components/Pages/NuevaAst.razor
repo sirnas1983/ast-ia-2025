@@ -1,0 +1,921 @@
+﻿@page "/nueva-ast"
+@page "/nueva-ast/{Id}"
+@rendermode InteractiveServer
+@using AstApp.Models
+@using AstApp.Servicios
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject IJSRuntime JS
+@inject AstStorageService AstStorage
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h3 class="mb-0">ANÁLISIS DE SEGURIDAD EN EL TRABAJO (AST)</h3>
+	<div class="d-flex gap-2">
+		<button class="btn btn-sm btn-outline-danger" @onclick="MostrarModalReiniciar">
+			🧹 Limpiar planilla
+		</button>
+		<button class="btn btn-sm btn-outline-primary" @onclick="MostrarModalConfirmarLimpiarHistorial">
+			🧠 Limpiar IA
+		</button>
+	</div>
+</div>
+
+<div class="row g-1">
+	<div class="col-md-6">
+		<label class="form-label mb-1">Trabajo a realizar:</label>
+		<input @bind="tarea" class="form-control form-control-sm" placeholder="Ej: Mantenimiento de válvulas" />
+	</div>
+	<div class="col-md-6">
+		<label class="form-label mb-1">Área de Trabajo:</label>
+		<input @bind="areaTrabajo" class="form-control form-control-sm" placeholder="Ej: Válvula bloqueo línea 24" />
+	</div>
+
+	<div class="col-md-4">
+		<label class="form-label mb-1">Gerencia:</label>
+		<select class="form-select form-select-sm" @bind="gerenciaSeleccionada">
+			@foreach (var g in gerencias)
+			{
+				<option value="@g">@g</option>
+			}
+		</select>
+	</div>
+
+	<div class="col-md-4">
+		<label class="form-label mb-1">Subgerencia:</label>
+		<select class="form-select form-select-sm" @bind="subgerenciaSeleccionada">
+			@foreach (var sg in subgerencias)
+			{
+				<option value="@sg">@sg</option>
+			}
+		</select>
+	</div>
+
+	<div class="col-md-4">
+		<label class="form-label mb-1">Sección:</label>
+		<input class="form-control form-control-sm text-uppercase" @bind="seccion" maxlength="3" />
+	</div>
+
+	<div class="col-md-6">
+		<label class="form-label mb-1">Tipo de Referencia:</label>
+		<select class="form-select form-select-sm" @bind="tipoReferencia">
+			<option value="OT">OT</option>
+			<option value="GRAFO">GRAFO</option>
+			<option value="CO">CO</option>
+			<option value="N/A">N/A</option>
+		</select>
+	</div>
+
+	<div class="col-md-6">
+		<label class="form-label mb-1">N° Referencia:</label>
+		<input class="form-control form-control-sm" @bind="numeroReferencia" />
+	</div>
+
+	<div class="col-12">
+		<label class="form-label mb-1">Herramientas a utilizar:</label>
+		<textarea class="form-control form-control-sm" rows="3" @bind="herramientas"></textarea>
+	</div>
+
+	<div class="col-12 mt-1">
+		<label class="form-label mb-1">Elementos de Protección Personal (EPP) requeridos:</label>
+	</div>
+
+	@foreach (var epp in eppsDisponibles)
+	{
+		<div class="col-6 col-md-4 col-lg-3">
+			<div class="form-check small">
+				<input class="form-check-input" type="checkbox" @bind="epp.Seleccionado" id="@epp.Texto.Replace(" ", "")" />
+				<label class="form-check-label" for="@epp.Texto.Replace(" ", "")">@epp.Texto</label>
+			</div>
+		</div>
+	}
+
+	@if (otrosEppSeleccionado)
+	{
+		<div class="col-12 mt-1">
+			<input class="form-control form-control-sm" @bind="otrosEppTexto" placeholder="Especificar otros EPP..." />
+		</div>
+	}
+</div>
+
+<hr />
+
+<h5>Tareas</h5>
+
+@for (int i = 0; i < actividades.Count; i++)
+{
+	var index = i;
+	<div class="card mb-3">
+		<div class="card-body">
+			<div class="d-flex justify-content-between align-items-center mb-2">
+				<h5 class="card-title d-flex align-items-center mb-0">
+					<i class="bi bi-check-circle-fill text-success me-2" title="Completa"></i>
+					@($"Tarea #{index + 1}")
+				</h5>
+				<button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarActividad(index)">
+					Eliminar
+				</button>
+			</div>
+
+
+			<input class="form-control mb-2"
+			placeholder="Descripción de la actividad"
+			@bind="actividades[index].Descripcion" />
+
+			<div class="d-flex align-items-center gap-2 mb-3">
+				<button class="btn btn-sm btn-outline-primary"
+				@onclick="() => SugerirConIA(index)"
+				disabled="@indicesCargando.Contains(index)">
+					@if (indicesCargando.Contains(index))
+					{
+						<span>
+							<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+							Cargando...
+						</span>
+					}
+					else
+					{
+						<span>
+							@(actividades[index].YaTieneSugerencias ? "🧠 Mas sugerencias..." : "🧠 Sugerir...")
+						</span>
+					}
+				</button>
+
+				<button class="btn btn-sm btn-secondary" @onclick="@(() => AbrirModal(index))">
+					<i class="bi bi-plus"></i> Agregar
+				</button>
+				<button class="btn btn-sm btn-outline-success" @onclick="@(() => LimpiarRegistros(index))">
+					🧹 Limpiar
+				</button>
+			</div>
+
+
+			<table class="table table-sm table-bordered align-middle">
+				<thead class="table-light">
+					<tr>
+						<th class="small">Peligros</th>
+						<th class="small">Riesgos</th>
+						<th class="small">Acciones Correctivas</th>
+					</tr>
+				</thead>
+				<tbody>
+					@if (actividades[index].PeligrosSugeridos.Any() ||
+															actividades[index].RiesgosSugeridos.Any() ||
+															actividades[index].AccionesSugeridas.Any())
+					{
+						var maxFilas = MaximoFilas(actividades[index]);
+						for (int j = 0; j < maxFilas; j++)
+						{
+							<tr>
+								<td class="small align-middle">
+									@if (j < actividades[index].PeligrosSugeridos.Count)
+									{
+										var peligro = actividades[index].PeligrosSugeridos[j];
+										<input class="form-check-input me-1"
+										type="checkbox"
+										checked="@peligro.Seleccionado"
+										@onchange="e => peligro.Seleccionado = (bool)e.Value!" />
+										<span>@peligro.Texto</span>
+									}
+								</td>
+								<td class="small align-middle">
+									@if (j < actividades[index].RiesgosSugeridos.Count)
+									{
+										var riesgo = actividades[index].RiesgosSugeridos[j];
+										<input class="form-check-input me-1"
+										type="checkbox"
+										checked="@riesgo.Seleccionado"
+										@onchange="e => riesgo.Seleccionado = (bool)e.Value!" />
+										<span>@riesgo.Texto</span>
+									}
+								</td>
+								<td class="small align-middle">
+									@if (j < actividades[index].AccionesSugeridas.Count)
+									{
+										var accion = actividades[index].AccionesSugeridas[j];
+										<input class="form-check-input me-1"
+										type="checkbox"
+										checked="@accion.Seleccionado"
+										@onchange="e => accion.Seleccionado = (bool)e.Value!" />
+										<span>@accion.Texto</span>
+									}
+								</td>
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+}
+
+<button class="btn btn-secondary mb-3 d-block" @onclick="AgregarActividad">+ Agregar actividad</button>
+
+<hr />
+
+<h5 class="mt-4">Asistentes</h5>
+
+<div class="input-group mb-3">
+	<span class="input-group-text"><i class="bi bi-search"></i></span>
+	<input class="form-control"
+	placeholder="Buscar por legajo, nombre o email"
+	value="@busquedaAsistente"
+	@oninput="OnBusquedaChanged" />
+</div>
+
+@if (resultadosBusqueda.Any())
+{
+	<ul class="list-group mb-3">
+		@foreach (var usuario in resultadosBusqueda)
+		{
+			<li class="list-group-item d-flex justify-content-between align-items-center">
+				<div>
+					<strong>@usuario.Legajo</strong> - <strong>@usuario.NombreApellido</strong> - @usuario.Email
+				</div>
+				<button class="btn btn-sm btn-primary" @onclick="() => AgregarAsistente(usuario)">Agregar</button>
+			</li>
+		}
+	</ul>
+}
+
+@if (asistentesSeleccionados.Any())
+{
+	<h6>Seleccionados:</h6>
+	<ul class="list-group mb-3">
+		@foreach (var usuario in asistentesSeleccionados)
+		{
+			<li class="list-group-item d-flex justify-content-between align-items-center">
+				<div>
+					<strong>@usuario.NombreApellido</strong> - @usuario.Legajo
+				</div>
+				<button class="btn btn-sm btn-outline-danger" @onclick="() => RemoverAsistente(usuario)">Quitar</button>
+			</li>
+		}
+	</ul>
+}
+
+<hr />
+
+<div class="d-flex gap-2 mb-3">
+	<button class="btn btn-outline-success" @onclick="GuardarBorrador">Guardar borrador</button>
+	<button class="btn btn-primary" @onclick="GuardarAST">Guardar</button>
+</div>
+
+<div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+	<div class="toast align-items-center text-white @toastClass border-0" role="alert"
+	aria-live="assertive" aria-atomic="true" id="toastMensaje">
+		<div class="d-flex">
+			<div class="toast-body">
+				@toastMensaje
+			</div>
+			<button type="button" class="btn-close btn-close-white me-2 m-auto"
+			data-bs-dismiss="toast" aria-label="Cerrar"></button>
+		</div>
+	</div>
+</div>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+	<div class="alert @alertClass mt-3">@mensaje</div>
+}
+
+@if (mostrarModal)
+{
+	<div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Agregar elemento manual</h5>
+					<button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Cerrar"></button>
+				</div>
+				<div class="modal-body">
+					<select class="form-select mb-3" @bind="tipoSeleccionado">
+						<option value="peligro">Peligro</option>
+						<option value="riesgo">Riesgo</option>
+						<option value="accion">Acción Correctiva</option>
+					</select>
+
+					<input class="form-control" @bind="nuevoElemento" placeholder="Escribí el nuevo elemento..." />
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
+					<button class="btn btn-primary" @onclick="ConfirmarModal">Agregar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+@if (mostrarModalReiniciar)
+{
+	<div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title text-danger">¿Reiniciar AST?</h5>
+					<button type="button" class="btn-close" @onclick="CerrarModalReiniciar" aria-label="Cerrar"></button>
+				</div>
+				<div class="modal-body">
+					<p>
+						Esto reiniciara por completo la AST.<br />
+						Esta accion es irreversible.
+					</p>
+					<p class="fw-bold text-danger">¿Estás seguro que deseas continuar?</p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-secondary" @onclick="CerrarModalReiniciar">Cancelar</button>
+					<button class="btn btn-danger" @onclick="ConfirmarModalReiniciar">Sí, limpiar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+@if (mostrarModalConfirmacion)
+{
+	<div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title text-danger">¿Reiniciar historial de IA?</h5>
+					<button type="button" class="btn-close" @onclick="CerrarModalConfirmacion" aria-label="Cerrar"></button>
+				</div>
+				<div class="modal-body">
+					<p>
+						Esto eliminará el historial de conversación con la IA.<br />
+						Las sugerencias futuras no tendrán en cuenta lo que ya se generó.
+					</p>
+					<p class="fw-bold text-danger">¿Estás seguro?</p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-secondary" @onclick="CerrarModalConfirmacion">Cancelar</button>
+					<button class="btn btn-danger" @onclick="ConfirmarLimpiarHistorialIA">Sí, limpiar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+
+@code {
+	[Inject] private OpenAIService OpenIA { get; set; } = default!;
+	[Parameter] public string? Id { get; set; }
+
+	private string tarea = string.Empty;
+	private string areaTrabajo = string.Empty;
+	private string gerenciaSeleccionada = string.Empty;
+	private string subgerenciaSeleccionada = string.Empty;
+	private string seccion = string.Empty;
+	private string tipoReferencia = "N/A";
+	private string numeroReferencia = string.Empty;
+	private string herramientas = string.Empty;
+	private List<string> gerencias = new() { "Operaciones", "Mantenimiento", "CSAS", "Obras" };
+	private List<string> subgerencias = new() { "Centro", "Este" };
+	private string mensaje = string.Empty;
+	private string alertClass = "alert-success";
+	private HashSet<int> indicesCargando = new();
+	private string toastMensaje = string.Empty;
+	private string toastClass = "bg-success";
+	private bool mostrarModal = false;
+	private string nuevoElemento = string.Empty;
+	private string tipoSeleccionado = "peligro";
+	private int actividadTarget = -1;
+	private Usuario? usuarioActual = new Usuario
+		{
+			Legajo = "11111",
+			NombreApellido = "Usuario de Prueba",
+			Email = "mock@empresa.com",
+			Gerencia = "Operaciones",
+			Seccion = "RES"
+		}; // mock para pruebas
+	private string busquedaAsistente = string.Empty;
+	private List<Usuario> resultadosBusqueda = new();
+	private List<Usuario> asistentesSeleccionados = new();
+	private List<Usuario> usuariosEmpresa = new()
+{
+	new Usuario { Legajo = "1001", NombreApellido = "Carla Gómez", Email = "carla.gomez@empresa.com", Gerencia = "Operaciones", Seccion = "REC" },
+	new Usuario { Legajo = "1002", NombreApellido = "Luis Martínez", Email = "luis.martinez@empresa.com", Gerencia = "Mantenimiento", Seccion = "RSP" },
+	new Usuario { Legajo = "1003", NombreApellido = "Ana Torres", Email = "ana.torres@empresa.com", Gerencia = "Sistemas", Seccion = "RES" },
+}; // mock para pruebas
+	private bool _yaRenderizado = false;
+	private List<CheckboxEpp> eppsDisponibles = new()
+{
+	new() { Texto = "Casco de seguridad" },
+	new() { Texto = "Protección visual / Máscara facial" },
+	new() { Texto = "Protección respiratoria" },
+	new() { Texto = "Protección auditiva" },
+	new() { Texto = "Calzado de seguridad" },
+	new() { Texto = "Arnés de cuerpo completo" },
+	new() { Texto = "Cinturón de seguridad" },
+	new() { Texto = "Mameluco ignífugo" },
+	new() { Texto = "Otros" }
+};
+
+	private string otrosEppTexto = string.Empty;
+
+	private bool otrosEppSeleccionado
+	{
+		get => eppsDisponibles.FirstOrDefault(e => e.Texto == "Otros")?.Seleccionado == true;
+		set
+		{
+			var otros = eppsDisponibles.FirstOrDefault(e => e.Texto == "Otros");
+			if (otros != null)
+				otros.Seleccionado = value;
+		}
+	}
+
+	public class EppOpcion
+	{
+		public string Nombre { get; set; }
+		public bool Seleccionado { get; set; }
+
+		public EppOpcion(string nombre)
+		{
+			Nombre = nombre;
+		}
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender && !_yaRenderizado)
+		{
+			_yaRenderizado = true;
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				var borradores = await AstStorage.GetAllDraftsAsync();
+				var ast = borradores.FirstOrDefault(a => a.Id == Id);
+				if (ast != null)
+				{
+					tarea = ast.TrabajoARealizar;
+					areaTrabajo = ast.AreaDeTrabajo;
+					gerenciaSeleccionada = ast.Gerencia;
+					subgerenciaSeleccionada = ast.Subgerencia;
+					seccion = ast.Seccion;
+					tipoReferencia = ast.TipoReferencia;
+					numeroReferencia = ast.NumeroReferencia;
+					herramientas = ast.Herramientas;
+
+					actividades = ast.Tareas.Select(a => new Actividad
+						{
+							Descripcion = a.Descripcion,
+							PeligrosSugeridos = a.Peligros.Select(p => new OpcionSugerida { Texto = p, Seleccionado = true }).ToList(),
+							RiesgosSugeridos = a.Riesgos.Select(r => new OpcionSugerida { Texto = r, Seleccionado = true }).ToList(),
+							AccionesSugeridas = a.AccionesCorrectivas.Select(ac => new OpcionSugerida { Texto = ac, Seleccionado = true }).ToList(),
+							YaTieneSugerencias = false
+						}).ToList();
+
+					foreach (var epp in eppsDisponibles)
+					{
+						epp.Seleccionado = ast.EppRequeridos.Any(x => x.Equals(epp.Texto, StringComparison.OrdinalIgnoreCase));
+					}
+					otrosEppTexto = ast.EppOtrosTexto;
+					otrosEppSeleccionado = !string.IsNullOrWhiteSpace(ast.EppOtrosTexto);
+					StateHasChanged();
+				}
+			}
+		}
+	}
+
+	private void AgregarAsistente(Usuario usuario)
+	{
+		if (!asistentesSeleccionados.Any(u => u.Email == usuario.Email))
+		{
+			asistentesSeleccionados.Add(usuario);
+			busquedaAsistente = string.Empty;
+			resultadosBusqueda.Clear();
+		}
+	}
+
+	private void RemoverAsistente(Usuario usuario)
+	{
+		asistentesSeleccionados.Remove(usuario);
+	}
+
+	private void OnBusquedaChanged(ChangeEventArgs e)
+	{
+		busquedaAsistente = e.Value?.ToString() ?? string.Empty;
+		BuscarUsuarios();
+	}
+
+	private void BuscarUsuarios()
+	{
+		if (string.IsNullOrWhiteSpace(busquedaAsistente))
+		{
+			resultadosBusqueda.Clear();
+			return;
+		}
+
+		var texto = busquedaAsistente.ToLowerInvariant();
+
+		resultadosBusqueda = usuariosEmpresa
+			.Where(u =>
+				(u.NombreApellido?.ToLowerInvariant().Contains(texto) ?? false) ||
+				(u.Email?.ToLowerInvariant().Contains(texto) ?? false) ||
+				(u.Legajo?.ToLowerInvariant().Contains(texto) ?? false)
+			)
+			.Except(asistentesSeleccionados)
+			.ToList();
+	}
+
+	private void LimpiarRegistros(int index)
+	{
+		var actividad = actividades[index];
+
+		actividad.PeligrosSugeridos = actividad.PeligrosSugeridos
+			.Where(p => p.Seleccionado)
+			.ToList();
+
+		actividad.RiesgosSugeridos = actividad.RiesgosSugeridos
+			.Where(r => r.Seleccionado)
+			.ToList();
+
+		actividad.AccionesSugeridas = actividad.AccionesSugeridas
+			.Where(a => a.Seleccionado)
+			.ToList();
+	}
+
+	private List<Actividad> actividades = new();
+
+	private bool mostrarModalConfirmacion = false;
+
+	private bool mostrarModalReiniciar = false;
+
+	private void MostrarModalConfirmarLimpiarHistorial()
+	{
+		mostrarModalConfirmacion = true;
+	}
+
+	private void MostrarModalReiniciar()
+	{
+		mostrarModalReiniciar = true;
+	}
+
+	private void CerrarModalConfirmacion()
+	{
+		mostrarModalConfirmacion = false;
+	}
+
+	private void CerrarModalReiniciar()
+	{
+		mostrarModalReiniciar = false;
+	}
+
+	private async Task ConfirmarLimpiarHistorialIA()
+	{
+		await OpenIA.LimpiarHistorialAsync();
+		foreach (var act in actividades)
+		{
+			act.YaTieneSugerencias = false;
+		}
+		mostrarModalConfirmacion = false;
+		toastMensaje = "Historial de IA limpiado correctamente.";
+		toastClass = "bg-success";
+		await JS.InvokeVoidAsync("mostrarToast");
+	}
+
+	private void AbrirModal(int index)
+	{
+		actividadTarget = index;
+		nuevoElemento = string.Empty;
+		tipoSeleccionado = "peligro";
+		mostrarModal = true;
+	}
+
+	private void CerrarModal() => mostrarModal = false;
+
+	private void Toggle(List<string> lista, string valor, bool seleccionado)
+	{
+		if (seleccionado && !lista.Contains(valor))
+			lista.Add(valor);
+		else if (!seleccionado && lista.Contains(valor))
+			lista.Remove(valor);
+	}
+
+	private async Task ConfirmarModalReiniciar()
+	{
+		tarea = string.Empty;
+		areaTrabajo = string.Empty;
+		gerenciaSeleccionada = string.Empty;
+		subgerenciaSeleccionada = string.Empty;
+		seccion = string.Empty;
+		tipoReferencia = "N/A";
+		numeroReferencia = string.Empty;
+		herramientas = string.Empty;
+		actividades = new List<Actividad> { new Actividad() };
+		await OpenIA.LimpiarHistorialAsync();
+		toastMensaje = "Planilla reiniciada correctamente.";
+		toastClass = "bg-success";
+		mostrarModalReiniciar = false;
+		await JS.InvokeVoidAsync("mostrarToast");
+	}
+
+	private void ConfirmarModal()
+	{
+		if (string.IsNullOrWhiteSpace(nuevoElemento)) return;
+
+		var actividad = actividades[actividadTarget];
+		var opcion = new OpcionSugerida
+			{
+				Texto = nuevoElemento.Trim(),
+				Seleccionado = true
+			};
+
+		switch (tipoSeleccionado)
+		{
+			case "peligro":
+				if (!actividad.PeligrosSugeridos.Any(p => p.Texto == opcion.Texto))
+					actividad.PeligrosSugeridos.Add(opcion);
+				break;
+			case "riesgo":
+				if (!actividad.RiesgosSugeridos.Any(r => r.Texto == opcion.Texto))
+					actividad.RiesgosSugeridos.Add(opcion);
+				break;
+			case "accion":
+				if (!actividad.AccionesSugeridas.Any(a => a.Texto == opcion.Texto))
+					actividad.AccionesSugeridas.Add(opcion);
+				break;
+		}
+
+		mostrarModal = false;
+	}
+
+	private async Task AgregarActividad()
+	{
+		if (actividades.Count() == 0)
+		{
+			actividades.Add(new Actividad());
+			return;
+		}
+
+		if (string.IsNullOrEmpty(tarea))
+		{
+			toastMensaje = "Para poder agregar más tareas, primero indicá un trabajo.";
+			toastClass = "bg-danger";
+			await JS.InvokeVoidAsync("mostrarToast");
+			return;
+		}
+
+		if (actividades.Count >= 10)
+		{
+			toastMensaje = "No podés cargar más de 10 tareas en una AST.";
+			toastClass = "bg-danger";
+			await JS.InvokeVoidAsync("mostrarToast");
+			return;
+		}
+
+		var ultima = actividades.Last();
+
+		var peligrosSeleccionados = ultima.PeligrosSugeridos.Where(p => p.Seleccionado).ToList();
+		var riesgosSeleccionados = ultima.RiesgosSugeridos.Where(r => r.Seleccionado).ToList();
+		var accionesSeleccionadas = ultima.AccionesSugeridas.Where(a => a.Seleccionado).ToList();
+
+
+		if (string.IsNullOrWhiteSpace(ultima.Descripcion) ||
+			ultima.PeligrosSugeridos.Count(p => p.Seleccionado) < 3 ||
+			ultima.RiesgosSugeridos.Count(r => r.Seleccionado) < 3 ||
+			ultima.AccionesSugeridas.Count(a => a.Seleccionado) < 3)
+		{
+			toastMensaje = "Completá la tarea actual antes de agregar una nueva. Se requieren al menos 3 peligros, 3 riesgos y 3 acciones correctivas seleccionadas.";
+			toastClass = "bg-danger";
+			await JS.InvokeVoidAsync("mostrarToast");
+			return;
+		}
+		actividades.Add(new Actividad());
+	}
+
+	private async Task GuardarAST()
+	{
+		if (string.IsNullOrWhiteSpace(tarea))
+		{
+			toastMensaje = "Por favor, ingresá una tarea.";
+			toastClass = "bg-danger";
+			await JS.InvokeVoidAsync("mostrarToast");
+			return;
+		}
+
+		if (actividades.Count < 5)
+		{
+			toastMensaje = "Debes cargar al menos 5 actividades en una AST.";
+			toastClass = "bg-danger";
+			await JS.InvokeVoidAsync("mostrarToast");
+			return;
+		}
+
+		var actividadesIncompletas = actividades
+			.Select((a, i) => new { Actividad = a, Index = i })
+			.Where(x => !x.Actividad.EstaCompleta)
+			.ToList();
+
+		if (actividadesIncompletas.Any())
+		{
+			var indices = string.Join(", ", actividadesIncompletas.Select(x => $"#{x.Index + 1}"));
+			toastMensaje = $"Las siguientes actividades están incompletas: Actividad {indices}. Cada una debe tener al menos 3 peligros, 3 riesgos y 3 acciones correctivas seleccionadas.";
+			toastClass = "bg-danger";
+			await JS.InvokeVoidAsync("mostrarToast");
+			return;
+		}
+
+		var eppsSeleccionados = eppsDisponibles
+	.Where(e => e.Seleccionado)
+	.Select(e => e.Texto)
+	.ToList();
+
+		if (eppsSeleccionados.Contains("Otros") && !string.IsNullOrWhiteSpace(otrosEppTexto))
+		{
+			eppsSeleccionados.Add(otrosEppTexto.Trim());
+		}
+
+		var nuevaAst = new Ast
+			{
+				TrabajoARealizar = tarea,
+				AreaDeTrabajo = areaTrabajo,
+				Gerencia = gerenciaSeleccionada,
+				Subgerencia = subgerenciaSeleccionada,
+				Seccion = seccion,
+				TipoReferencia = tipoReferencia,
+				NumeroReferencia = numeroReferencia,
+				Herramientas = herramientas,
+				Ejecutor = usuarioActual,
+				FechaHora = DateTime.Now,
+				EppRequeridos = eppsSeleccionados,
+				Asistentes = asistentesSeleccionados.Select(a => new UsuarioAsistente
+				{
+					Usuario = new Usuario
+					{
+						Legajo = a.Legajo,
+						NombreApellido = a.NombreApellido,
+						Email = a.Email,
+						Gerencia = a.Gerencia,
+						Seccion = a.Seccion
+					},
+					FechaAceptacion = null,
+					Descripcion = ""
+				}).ToList(),
+				Tareas = actividades.Select(t => new TareaAst
+				{
+					Descripcion = t.Descripcion,
+					Peligros = t.PeligrosSugeridos.Where(p => p.Seleccionado).Select(p => p.Texto).ToList(),
+					Riesgos = t.RiesgosSugeridos.Where(r => r.Seleccionado).Select(r => r.Texto).ToList(),
+					AccionesCorrectivas = t.AccionesSugeridas.Where(a => a.Seleccionado).Select(a => a.Texto).ToList()
+				}).ToList()
+			};
+
+
+
+		await AstStorage.SaveAsync(nuevaAst);
+		toastMensaje = $"AST guardada: {tarea} con {actividades.Count} actividades completas.";
+		toastClass = "bg-success text-dark";
+		await JS.InvokeVoidAsync("mostrarToast");
+
+		Navigation.NavigateTo("/mis-ast");
+	}
+
+	private int MaximoFilas(Actividad actividad)
+	{
+		return new[] {
+		actividad.PeligrosSugeridos.Count,
+		actividad.RiesgosSugeridos.Count,
+		actividad.AccionesSugeridas.Count
+		}.Max();
+	}
+
+	private async Task SugerirConIA(int index)
+	{
+		if (string.IsNullOrEmpty(tarea))
+		{
+			toastMensaje = $"Para poder utilizar la IA debes indicar una TAREA";
+			toastClass = "bg-danger";
+			await JS.InvokeVoidAsync("mostrarToast");
+			return;
+		}
+
+		if (string.IsNullOrEmpty(actividades[index].Descripcion))
+		{
+			toastMensaje = $"¡Debes ingresar una descripción de la TAREA!";
+			toastClass = "bg-warning";
+			await JS.InvokeVoidAsync("mostrarToast");
+			return;
+		}
+
+		if (index > 0 && !actividades[index - 1].EstaCompleta)
+		{
+			toastMensaje = $"Completá primero la Tarea #{index} antes de solicitar una nueva sugerencia.";
+			toastClass = "bg-danger";
+			await JS.InvokeVoidAsync("mostrarToast");
+			return;
+		}
+
+		indicesCargando.Add(index);
+		try
+		{
+			var actividad = actividades[index];
+			string tareaGeneral = tarea;
+			string actividadEspecifica = actividad.Descripcion;
+			string prompt = $@"
+							Revisá si ya me diste sugerencias para la tarea: ""{actividadEspecifica}"".
+							➤ Si ya generaste anteriormente peligros, riesgos y acciones correctivas para esta actividad, necesito una **nueva lista completamente distinta**.
+							➤ No repitas conceptos ya utilizados, **ni reformules peligros con otras palabras** si su esencia es la misma.
+							➤ Los nuevos elementos deben aportar **variedad real**, no solo diferencias superficiales de redacción.
+							➤ Si nunca analizaste esta tarea, podés incluir ítems según tu criterio.
+							La única salida válida es un objeto JSON que comience directamente con '{{' y contenga únicamente los campos:
+							- peligros (lista plana de fuentes de daño concretas),
+							- riesgos (lista plana de consecuencias específicas),
+							- accionesCorrectivas (lista de medidas operativas inmediatas),
+							- observaciones (null o explicación si no puede analizarse la tarea).
+							No agregues ningún texto antes ni después del JSON. Comentarios adicionales, solo en el campo 'observaciones'.
+							";
+
+			SugerenciaIA? resultado = actividad.YaTieneSugerencias
+				? await OpenIA.AgregarMensajeUsuarioAsync(prompt)
+				: await OpenIA.AgregarTareaYObtenerRespuestaAsync(tareaGeneral, actividadEspecifica, areaTrabajo, herramientas);
+
+			if (resultado is not null)
+			{
+				actividad.PeligrosSugeridos = actividad.PeligrosSugeridos
+					.UnionBy(
+						resultado.Peligros.Select(p => new OpcionSugerida { Texto = p, Seleccionado = false }),
+						o => o.Texto
+					)
+					.ToList();
+
+				actividad.RiesgosSugeridos = actividad.RiesgosSugeridos
+					.UnionBy(
+						resultado.Riesgos.Select(r => new OpcionSugerida { Texto = r, Seleccionado = false }),
+						o => o.Texto
+					)
+					.ToList();
+
+				actividad.AccionesSugeridas = actividad.AccionesSugeridas
+					.UnionBy(
+						resultado.AccionesCorrectivas.Select(a => new OpcionSugerida { Texto = a, Seleccionado = false }),
+						o => o.Texto
+					)
+					.ToList();
+
+
+
+				if (!string.IsNullOrWhiteSpace(resultado.Observaciones))
+				{
+					toastMensaje = $"ATENCIÓN: {resultado.Observaciones.Trim()}";
+					toastClass = "bg-warning text-dark";
+					await JS.InvokeVoidAsync("mostrarToast");
+				}
+
+				actividad.YaTieneSugerencias = true;
+			}
+		}
+		finally
+		{
+			indicesCargando.Remove(index);
+			StateHasChanged();
+		}
+	}
+
+	private void EliminarActividad(int index)
+	{
+		if (index >= 0 && index < actividades.Count)
+		{
+			actividades.RemoveAt(index);
+		}
+	}
+
+	private async Task GuardarBorrador()
+	{
+		var borrador = new Ast()
+			{
+				Id = Guid.NewGuid().ToString(),
+				TrabajoARealizar = tarea,
+				AreaDeTrabajo = areaTrabajo,
+				Gerencia = gerenciaSeleccionada,
+				Subgerencia = subgerenciaSeleccionada,
+				Seccion = seccion,
+				TipoReferencia = tipoReferencia,
+				NumeroReferencia = numeroReferencia,
+				Herramientas = herramientas,
+				FechaHora = DateTime.Now,
+				EppRequeridos = eppsDisponibles
+						.Where(e => e.Seleccionado)
+						.Select(e => e.Texto == "Otros" ? otrosEppTexto : e.Texto)
+						.ToList(),
+				Tareas = actividades.Select(a => new TareaAst
+				{
+					Descripcion = a.Descripcion,
+					Peligros = a.PeligrosSugeridos.Where(p => p.Seleccionado).Select(p => p.Texto).ToList(),
+					Riesgos = a.RiesgosSugeridos.Where(r => r.Seleccionado).Select(r => r.Texto).ToList(),
+					AccionesCorrectivas = a.AccionesSugeridas.Where(ac => ac.Seleccionado).Select(ac => ac.Texto).ToList()
+				}).ToList()
+			};
+
+		await AstStorage.SaveDraftAsync(borrador);
+
+		toastMensaje = "Borrador guardado localmente.";
+		toastClass = "bg-success";
+		await JS.InvokeVoidAsync("mostrarToast");
+
+		Navigation.NavigateTo("/mis-ast");
+	}
+
+}
+a

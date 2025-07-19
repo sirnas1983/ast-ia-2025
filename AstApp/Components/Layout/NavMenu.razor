@@ -1,0 +1,54 @@
+﻿<style>
+	.navbar .nav-link {
+		height: 70px; /* misma altura que la navbar */
+		display: flex;
+		align-items: center;
+	}
+
+		.navbar .nav-link.active {
+			border-bottom: 3px solid #0d6efd; /* azul Bootstrap */
+			font-weight: bold;
+		}
+
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light px-3">
+	<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="bi bi-list" style="font-size: 1.5rem;"></span>ACA ESTOY
+	</button>
+
+	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex gap-3">
+			<li class="nav-item">
+				<span></span>
+			</li>
+			
+			<li class="nav-item">
+				<NavLink class="nav-link text-dark fw-semibold" href="/mis-ast" Match="NavLinkMatch.Prefix">
+					Mis AST
+				</NavLink>
+			</li>
+			@* <li class="nav-item"> *@
+			@* 	<NavLink class="nav-link text-dark fw-semibold" href="/nueva-ast" Match="NavLinkMatch.Prefix"> *@
+			@* 		Nueva AST *@
+			@* 	</NavLink> *@
+			@* </li> *@
+			<li class="nav-item">
+				<NavLink class="nav-link text-dark fw-semibold" href="/mis-pendientes" Match="NavLinkMatch.Prefix">
+					Mis Pendientes
+				</NavLink>
+			</li>
+			<li class="nav-item">
+				<NavLink class="nav-link text-dark fw-semibold" href="/fiscalizar-ast" Match="NavLinkMatch.Prefix">
+					Fiscalizar AST
+				</NavLink>
+			</li>
+		</ul>
+
+		<div class="d-flex align-items-center ms-3">
+			<img src="images/logo.png" alt="Logo empresa" class="img-fluid" style="height: 6rem;" />
+		</div>
+	</div>
+</nav>
+<hr class="p-1" />

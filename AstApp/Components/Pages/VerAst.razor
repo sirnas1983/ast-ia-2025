@@ -1,0 +1,209 @@
+﻿@page "/ver-ast/{Id}"
+@rendermode InteractiveServer
+@using AstApp.Models
+@using Servicios
+@inject AstStorageService AstStorage
+@inject IJSRuntime JS
+
+<style>
+	.tabla-con-bordes td, .tabla-con-bordes th {
+		border: 1px solid #dee2e6 !important;
+	}
+
+	.tabla-con-bordes {
+		border-collapse: collapse;
+	}
+</style>
+
+@if (ast is null)
+{
+	<p>Cargando AST...</p>
+}
+else
+{
+	<button id="btnImprimir" class="btn btn-outline-primary mb-3" @onclick="@(() => JS.InvokeVoidAsync("window.print"))">
+		🖨️ Imprimir
+	</button>
+
+	<div id="contenidoAst" class="table-responsive-md card p-3 shadow-sm">
+		<table class="table table-sm tabla-con-bordes mt-3">
+			<tr>
+				<td rowspan="7" style="width: 20%; text-align: center;">
+					<img src="images/logo.png" alt="Logo" style="max-width: 200px;" />
+				</td>
+				<td colspan="2" rowspan="2" class="text-center fw-bolder fs-4">
+					<h3>AST - ANÁLISIS DE SEGURIDAD EN EL TRABAJO</h3>
+				</td>
+				<td style="width:20%"><strong>Fecha:</strong> @ast.FechaHora.ToString("g")</td>
+			</tr>
+			<tr>
+				<td><strong>Id:</strong> @ast.Id</td>
+			</tr>
+			<tr>
+				<td colspan="2"><strong>Trabajo a realizar:</strong> @ast.TrabajoARealizar</td>
+				<td><strong>Gerencia:</strong> @ast.Gerencia</td>
+			</tr>
+			<tr>
+				<td colspan="2"><strong>Área de trabajo:</strong> @ast.AreaDeTrabajo</td>
+				<td><strong>Subgerencia:</strong> @ast.Subgerencia</td>
+			</tr>
+			<tr>
+				<td><strong>Tipo Ref:</strong> @ast.TipoReferencia</td>
+				<td><strong>N° Ref:</strong> @ast.NumeroReferencia</td>
+				<td><strong>Sección:</strong> @ast.Seccion</td>
+			</tr>
+			<tr>
+				<td colspan="3"><strong>Herramientas:</strong> @ast.Herramientas</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<strong>EPP Requerido:</strong>
+					@if (ast.EppRequeridos != null && ast.EppRequeridos.Any())
+					{
+						<span>@string.Join(", ", ast.EppRequeridos)</span>
+					}
+					else
+					{
+						<em>No se especificaron</em>
+					}
+				</td>
+			</tr>
+
+		</table>
+
+		<h4 class="fw-bolder mt-4">Tareas a realizar</h4>
+
+		<table class="table table-sm tabla-con-bordes">
+			<tbody>
+				@for (int i = 0; i < ast.Tareas.Count; i++)
+				{
+					var tarea = ast.Tareas[i];
+					var peligros = tarea.Peligros ?? new List<string>();
+					var riesgos = tarea.Riesgos ?? new List<string>();
+					var acciones = tarea.AccionesCorrectivas ?? new List<string>();
+					var maxFilas = Math.Max(Math.Max(peligros.Count, riesgos.Count), acciones.Count);
+
+					<tr class="table-secondary fw-bold">
+						<td colspan="3">Tarea #@(i + 1): @tarea.Descripcion</td>
+					</tr>
+					<tr class="table-info">
+						<th style="width: 30%">Peligros</th>
+						<th style="width: 30%">Riesgos</th>
+						<th style="width: 40%">Acciones Correctivas</th>
+					</tr>
+
+					@for (int j = 0; j < maxFilas; j++)
+					{
+						<tr>
+							<td>@(j < peligros.Count ? peligros[j] : "")</td>
+							<td>@(j < riesgos.Count ? riesgos[j] : "")</td>
+							<td>@(j < acciones.Count ? acciones[j] : "")</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+
+		<hr />
+
+		<h5 class="fw-bolder mt-4">Confeccionó</h5>
+		<table class="table table-sm tabla-con-bordes w-100">
+			<thead class="table-light">
+				<tr>
+					<th>Legajo</th>
+					<th>Nombre y Apellido</th>
+					<th>Gerencia</th>
+					<th>Sección</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>@ast.Ejecutor.Legajo</td>
+					<td>@ast.Ejecutor.NombreApellido</td>
+					<td>@ast.Ejecutor.Gerencia</td>
+					<td>@ast.Ejecutor.Seccion</td>
+				</tr>
+			</tbody>
+		</table>
+
+		@if (ast.Asistentes?.Any() == true)
+		{
+			<h5 class="fw-bolder mt-4">Asistentes que participaron</h5>
+			<table class="table table-sm tabla-con-bordes w-100">
+				<thead class="table-light">
+					<tr>
+						<th>Legajo</th>
+						<th>Nombre y Apellido</th>
+						<th>Gerencia</th>
+						<th>Sección</th>
+						<th>Estado</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var asistente in ast.Asistentes)
+					{
+						<tr>
+							<td>@asistente?.Usuario?.Legajo</td>
+							<td>@asistente?.Usuario?.NombreApellido</td>
+							<td>@asistente?.Usuario?.Gerencia</td>
+							<td>@asistente?.Usuario?.Seccion</td>
+							<td>
+								@if (asistente?.FechaAceptacion is null)
+								{
+									<span class="badge bg-warning text-dark rounded-pill">Pendiente</span>
+								}
+								else
+								{
+									<span class="badge bg-success rounded-pill">
+										Aceptado<br />
+										<small>@asistente.FechaAceptacion?.ToString("g")</small>
+									</span>
+								}
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+	</div>
+}
+<style>
+	@@media print {
+		body * {
+			visibility: hidden;
+		}
+
+		#contenidoAst, #contenidoAst * {
+			visibility: visible;
+		}
+
+		#contenidoAst {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+		}
+	}
+</style>
+
+@code {
+	[Parameter]
+	public string? Id { get; set; }
+	private bool cargado = false;
+	private Ast? ast;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender && !cargado)
+		{
+			if (!string.IsNullOrEmpty(Id))
+			{
+				var todas = await AstStorage.GetAllAsync();
+				ast = todas.FirstOrDefault(a => a.Id == Id);
+				cargado = true;
+				StateHasChanged();
+
+			}
+		}
+	}
+}
